@@ -19,6 +19,7 @@
 #include <vector>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 typedef struct {
 	unsigned char red, green, blue;
@@ -29,10 +30,113 @@ typedef struct {
 	PPMPixel *data;
 } PPMImage;
 
+#define RGB_COMPONENT_COLOR 255
+
 #define MAXROWS 512
 #define MAXCOLS 512
 #define MAXLENGTH 256
 #define MAXVALUE 255
+
+static PPMImage *readPPM(const char *filename)
+{
+	char buff[16];
+	PPMImage *img;
+	FILE *fp;
+	int c, rgb_comp_color;
+	//open PPM file for reading
+	fopen_s(&fp, filename, "rb");
+	if (!fp) {
+		fprintf(stderr, "Unable to open file '%s'\n", filename);
+		exit(1);
+	}
+
+	//read image format
+	if (!fgets(buff, sizeof(buff), fp)) {
+		perror(filename);
+		exit(1);
+	}
+
+	//check the image format
+	if (buff[0] != 'P' || buff[1] != '6') {
+		fprintf(stderr, "Invalid image format (must be 'P6')\n");
+		exit(1);
+	}
+
+	//alloc memory form image
+	img = (PPMImage *)malloc(sizeof(PPMImage));
+	if (!img) {
+		fprintf(stderr, "Unable to allocate memory\n");
+		exit(1);
+	}
+
+	//check for comments
+	c = getc(fp);
+	while (c == '#') {
+		while (getc(fp) != '\n');
+		c = getc(fp);
+	}
+
+	ungetc(c, fp);
+	//read image size information
+	if (fscanf_s(fp, "%d %d", &img->x, &img->y) != 2) {
+		fprintf(stderr, "Invalid image size (error loading '%s')\n", filename);
+		exit(1);
+	}
+
+	//read rgb component
+	if (fscanf_s(fp, "%d", &rgb_comp_color) != 1) {
+		fprintf(stderr, "Invalid rgb component (error loading '%s')\n", filename);
+		exit(1);
+	}
+
+	//check rgb component depth
+	if (rgb_comp_color != RGB_COMPONENT_COLOR) {
+		fprintf(stderr, "'%s' does not have 8-bits components\n", filename);
+		exit(1);
+	}
+
+	while (fgetc(fp) != '\n');
+	//memory allocation for pixel data
+	img->data = (PPMPixel*)malloc(img->x * img->y * sizeof(PPMPixel));
+
+	if (!img) {
+		fprintf(stderr, "Unable to allocate memory\n");
+		exit(1);
+	}
+
+	//read pixel data from file
+	if (fread(img->data, 3 * img->x, img->y, fp) != img->y) {
+		fprintf(stderr, "Error loading image '%s'\n", filename);
+		exit(1);
+	}
+
+	fclose(fp);
+	return img;
+}
+void writePPM(const char *filename, PPMImage *img)
+{
+	FILE *fp;
+	//open file for output
+	fopen_s(&fp, filename, "wb");
+	if (!fp) {
+		fprintf(stderr, "Unable to open file '%s'\n", filename);
+		exit(1);
+	}
+
+	//write the header file
+	//image format
+	fprintf(fp, "P6\n");
+
+	//image size
+	fprintf(fp, "%d %d\n", img->x, img->y);
+
+	// rgb component depth
+	fprintf(fp, "%d\n", RGB_COMPONENT_COLOR);
+
+	// pixel data
+	fwrite(img->data, 3 * img->x, img->y, fp);
+	fclose(fp);
+}
 
 using namespace std;
 /* INPUT: a filename (char*),row and column dimension variables (long), and
@@ -77,13 +181,13 @@ int pgmRead(char *fileName, long *rows, long *cols,
 		getline(filePointer, tmpline);
 		line = const_cast<char*>(tmpline.c_str());
 	}
+	// Format P2
 	if (line[0] == 'P' && (line[1] == '2')) {
 		binary = 0;
-		/*   printf ("\nFile Format: P2\n"); */
 	}
+	// Format P5
 	else if (line[0] == 'P' && (line[1] == '5')) {
 		binary = 1;
-		/*  printf ("\nFORMAT: P5\n"); */
 	}
 	else {
 		printf("ERROR: incorrect file format\n\n");
@@ -134,16 +238,16 @@ int pgmRead(char *fileName, long *rows, long *cols,
 				filePointer >> image[i][j];
 				if (filePointer.eof()) break;
 			}
+			if (filePointer.eof()) break;
 		}
 	}
 	else {
 		for (i = 0; i < (*rows); i++) {
 			for (j = 0; j < (*cols); j++) {
-				filePointer >> temp;
-				if (temp == EOF) break;
-				image[i][j] = (unsigned char)temp;
+				filePointer >> image[i][j];
+				if (filePointer.eof()) break;
 			}
-			if (temp == EOF) break;
+			if (filePointer.eof()) break;
 		}
 	}
 
@@ -208,18 +312,62 @@ int pgmWrite(char* filename, long rows, long cols,
 	return(1);
 }
 
+void patchworkPPM(PPMImage *image, int &debutcarre1, int &debutcarre2, int &taillecarres)
+{
+	srand(time(NULL));
+	debutcarre1 = rand() % (image->x * image->y);
+	debutcarre2 = rand() % (image->x * image->y);
+	taillecarres = 30;
+	
+	for (int i = 0; i < taillecarres; i++)
+	{
+		for (int j = 0; j < taillecarres; j++)
+		{
+			image->data[debutcarre1 + j + i * 512].red = (unsigned char)((int)(image->data[debutcarre1 + j + i * 512].red) - 1);
+			image->data[debutcarre1 + j + i * 512].green = (unsigned char)((int)(image->data[debutcarre1 + j + i * 512].green) - 1);
+			image->data[debutcarre1 + j + i * 512].blue = (unsigned char)((int)(image->data[debutcarre1 + j + i * 512].blue) - 1);
+
+			image->data[debutcarre2 + j + i * 512].red = (unsigned char)((int)(image->data[debutcarre1 + j + i * 512].red) + 1);
+			image->data[debutcarre2 + j + i * 512].green = (unsigned char)((int)(image->data[debutcarre1 + j + i * 512].green) + 1);
+			image->data[debutcarre2 + j + i * 512].blue = (unsigned char)((int)(image->data[debutcarre1 + j + i * 512].blue) + 1);
+		}
+	}
+}
+
+void patchworkPGM(unsigned char image[MAXROWS][MAXCOLS], long rows, long cols, int &debutcarre1, int &debutcarre2, int &taillecarres)
+{
+	srand(time(NULL));
+	debutcarre1 = rand() % (rows * cols);
+	int debutcarre1x = debutcarre1 / cols;
+	int debutcarre1y = debutcarre1 % rows;
+	debutcarre2 = rand() % (rows * cols);
+	int debutcarre2x = debutcarre2 / cols;
+	int debutcarre2y = debutcarre2 % rows;
+	taillecarres = 30;
+
+	for (int i = 0; i < taillecarres; i++)
+	{
+		for (int j = 0; j < taillecarres; j++)
+		{
+			image[debutcarre1y + i][debutcarre1x + j] = (unsigned char)((int)(image[debutcarre1y + i][debutcarre1x + j]) - 1);
+
+			image[debutcarre2y + i][debutcarre2x + j] = (unsigned char)((int)(image[debutcarre2y + i][debutcarre2x + j]) + 1);
+		}
+	}
+}
+
 int main()
 {
-
 	long rows, cols;
 	char nomfich[20];
-	unsigned char photo[MAXROWS][MAXCOLS];
+	//unsigned char photo[MAXROWS][MAXCOLS];
+	PPMImage *image;
 	cout << "Nom du fichier :";
 	cin >> nomfich;
-	int a = pgmRead(nomfich, &rows, &cols, photo);
-	int b = pgmWrite("lenares.pgm", rows, cols, photo, "format pgm");
-
-
+	//int a = pgmRead(nomfich, &rows, &cols, photo);
+	//int b = pgmWrite("lenares.pgm", rows, cols, photo, "format pgm");
+	image = readPPM(nomfich);
+	writePPM("samarch.ppm", image);
 	system("pause");
 
 

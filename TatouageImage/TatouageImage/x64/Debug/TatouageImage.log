@@ -1,3 +1,8 @@
 ﻿  main.cpp
-c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(169): warning C4101: 'maxval' : variable locale non référencée
+c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(161): warning C4101: 'temp' : variable locale non référencée
+c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(273): warning C4101: 'maxval' : variable locale non référencée
+c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(317): warning C4244: 'argument' : conversion de 'time_t' en 'unsigned int', perte possible de données
+c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(356): warning C4244: 'argument' : conversion de 'time_t' en 'unsigned int', perte possible de données
+c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(378): warning C4101: 'rows' : variable locale non référencée
+c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(378): warning C4101: 'cols' : variable locale non référencée
   TatouageImage.vcxproj -> C:\Users\Laurent\Documents\GitKraken\Tatouage-Image\TatouageImage\x64\Debug\TatouageImage.exe
