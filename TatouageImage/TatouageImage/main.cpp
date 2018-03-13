@@ -20,6 +20,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 typedef struct {
 	unsigned char red, green, blue;
@@ -312,6 +314,7 @@ int pgmWrite(char* filename, long rows, long cols,
 	return(1);
 }
 
+// Utilise la méthode du patchwork (PPM)
 void patchworkPPM(PPMImage *image, int &debutcarre1, int &debutcarre2, int &taillecarres)
 {
 	srand(time(NULL));
@@ -334,6 +337,7 @@ void patchworkPPM(PPMImage *image, int &debutcarre1, int &debutcarre2, int &tail
 	}
 }
 
+// Utilise la méthode du patchwork (PGM)
 void patchworkPGM(unsigned char image[MAXROWS][MAXCOLS], long rows, long cols, int &debutcarre1, int &debutcarre2, int &taillecarres)
 {
 	srand(time(NULL));
@@ -356,18 +360,123 @@ void patchworkPGM(unsigned char image[MAXROWS][MAXCOLS], long rows, long cols, i
 	}
 }
 
+double alphaDCT(int x, int N)
+{
+	if (x == 0)
+	{
+		return 1.0 / sqrt(N);
+	}
+	else
+	{
+		return sqrt(2.0 / N);
+	}
+}
+
+// Calcule la DCT d'un bloc de 8 * 8 et renvoie le tableau qui contient les résultats (PGM)
+unsigned char dctBlocPGM(unsigned char image[MAXROWS][MAXCOLS], int starti, int startj)
+{
+	double tmp;
+	double ret = 0;
+	for (int i = starti; i < starti + 8; i++)
+	{
+		tmp = 0;
+		for (int j = startj; j < startj + 8; j++)
+		{
+			tmp += (double)image[i][j] * cos((startj * M_PI * (2.0 * i + 1.0)) / 2.0 * 8.0) * cos((starti * M_PI * (2.0 * j + 1.0)) / 2.0 * 8.0);
+		}
+		ret += tmp;
+	}
+	ret *= alphaDCT(starti, 8) * alphaDCT(startj, 8);
+	return (unsigned char) ret;
+}
+
+// Calcule la DCT entière et remplace l'image par celle-ci (PGM)
+void dctPGM(unsigned char image[MAXROWS][MAXCOLS], long rows, long cols)
+{
+	for (int i = 0; i < rows; i)
+	{
+		for (int j = 0; j < cols; j)
+		{
+			image[i][j] = dctBlocPGM(image, i, j);
+		}
+	}
+	return;
+}
+
+// Calcule la DCT d'un bloc de 8 * 8 et renvoie le tableau qui contient les résultats (PPM)
+PPMPixel dctBlocPPM(PPMImage *image, int starti, int startj)
+{
+	double tmpr;
+	double tmpg;
+	double tmpb;
+	double retr;
+	double retg;
+	double retb;
+	PPMPixel ret;
+	retr = 0;
+	retg = 0;
+	retb = 0;
+	for (int i = starti; i < starti + 8; i++)
+	{
+		tmpr = 0;
+		tmpg = 0;
+		tmpb = 0;
+		for (int j = startj; j < startj + 8; j++)
+		{
+			tmpr += (double)image->data[i * image->x + j].red * cos((startj * M_PI * (2.0 * i + 1.0)) / 2.0 * 8.0) * cos((starti * M_PI * (2.0 * j + 1.0)) / 2.0 * 8.0);
+			tmpg += (double)image->data[i * image->x + j].green * cos((startj * M_PI * (2.0 * i + 1.0)) / 2.0 * 8.0) * cos((starti * M_PI * (2.0 * j + 1.0)) / 2.0 * 8.0);
+			tmpb += (double)image->data[i * image->x + j].blue * cos((startj * M_PI * (2.0 * i + 1.0)) / 2.0 * 8.0) * cos((starti * M_PI * (2.0 * j + 1.0)) / 2.0 * 8.0);
+		}
+		retr += tmpr;
+		retg += tmpg;
+		retb += tmpb;
+	}
+	retr *= alphaDCT(starti, 8) * alphaDCT(startj, 8);
+	retg *= alphaDCT(starti, 8) * alphaDCT(startj, 8);
+	retb *= alphaDCT(starti, 8) * alphaDCT(startj, 8);
+	ret.red = (unsigned char)retr;
+	ret.green = (unsigned char)retg;
+	ret.blue = (unsigned char)retb;
+	return ret;
+}
+
+// Calcule la DCT entière et remplace l'image par celle-ci (PPM)
+void dctPPM(PPMImage *image)
+{
+	PPMPixel tmp;
+	for (int i = 0; i < image->x; i++)
+	{
+		for (int j = 0; j < image->y; j++)
+		{
+			tmp = dctBlocPPM(image, i, j);
+			image->data[i * image->x + j].red = tmp.red;
+			image->data[i * image->x + j].green = tmp.green;
+			image->data[i * image->x + j].blue = tmp.blue;
+		}
+	}
+	return;
+}
+
 int main()
 {
 	long rows, cols;
+	int debutcarre1, debutcarre2, taillecarres;
 	char nomfich[20];
-	//unsigned char photo[MAXROWS][MAXCOLS];
-	PPMImage *image;
+	unsigned char image[MAXROWS][MAXCOLS];
+	//PPMImage *image;
 	cout << "Nom du fichier :";
 	cin >> nomfich;
-	//int a = pgmRead(nomfich, &rows, &cols, photo);
-	//int b = pgmWrite("lenares.pgm", rows, cols, photo, "format pgm");
-	image = readPPM(nomfich);
-	writePPM("samarch.ppm", image);
+	pgmRead(nomfich, &rows, &cols, image);
+	//image = readPPM(nomfich);
+	/*
+	patchworkPGM(image, rows, cols, debutcarre1, debutcarre2, taillecarres);
+	cout << "debut carre 1 :\t" << debutcarre1 << endl;
+	cout << "debut carre 2 :\t" << debutcarre2 << endl;
+	cout << "taille des carres :\t" << taillecarres << endl;
+	*/
+	dctPGM(image, rows, cols);
+	pgmWrite("lenares.pgm", rows, cols, image, "format pgm");
+	//writePPM("samarch.ppm", image);
 	system("pause");
 
 
