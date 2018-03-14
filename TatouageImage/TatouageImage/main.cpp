@@ -461,20 +461,111 @@ void extractionPGMdePPM(PPMImage *im_rvb, unsigned char im_gris[MAXROWS][MAXCOLS
 	return;
 }
 
+void dissimulationTexteDansPGM(unsigned char im_gris[MAXROWS][MAXCOLS], long rows, long cols, int k, string texteacacher)
+{
+	if (texteacacher.size() > (cols * rows) / 4)
+	{
+		cout << "Chaine de caractere trop longue par rapport a l image" << endl;
+		return;
+	}
+	else if (k < 0)
+	{
+		cout << "Constante ne peut etre negative" << endl;
+		return;
+	}
+	else if (k > (rows - 4 * sqrt(texteacacher.size())))
+	{
+		cout << "Constante trop grande pour rentrer toute la chaine de caractere" << endl;
+		return;
+	}
+	else if (texteacacher[texteacacher.size() - 1] != '*')
+	{
+		cout << "La chaine de caracteres doit finir par *" << endl;
+		return;
+	}
+
+	unsigned char tmp1, tmp2, tmp3, tmp4;
+	int compteur = 0;
+
+	for (int i = k + 2 * sqrt(texteacacher.size()); i < k + 4 * sqrt(texteacacher.size()) && compteur < texteacacher.size(); i++)
+	{
+		for (int j = k + 2 * sqrt(texteacacher.size()); j < k + 4 * sqrt(texteacacher.size()) && compteur < texteacacher.size(); j += 4)
+		{
+			// A cause de l'optimisation de compilateur (je suppose?) il faut séparer les lignes pour que ce soit bien des 0 qui remplacent les anciens bits
+			tmp1 = (unsigned char) texteacacher[compteur] << 6;
+			tmp1 = tmp1 >> 6;
+			tmp2 = (unsigned char) texteacacher[compteur] << 4;
+			tmp2 = tmp2 >> 6;
+			tmp3 = (unsigned char) texteacacher[compteur] << 2;
+			tmp3 = tmp3 >> 6;
+			tmp4 = (unsigned char) texteacacher[compteur] >> 6;
+			compteur++;
+
+			// Pareil que juste avant
+			im_gris[i][j] = im_gris[i][j] >> 2;
+			im_gris[i][j] = im_gris[i][j] << 2;
+			im_gris[i][j] = im_gris[i][j] | tmp1;
+
+			im_gris[i][j + 1] = im_gris[i][j + 1] >> 2;
+			im_gris[i][j + 1] = im_gris[i][j + 1] << 2;
+			im_gris[i][j + 1] = im_gris[i][j + 1] | tmp2;
+
+			im_gris[i][j + 2] = im_gris[i][j + 2] >> 2;
+			im_gris[i][j + 2] = im_gris[i][j + 2] << 2;
+			im_gris[i][j + 2] = im_gris[i][j + 2] | tmp3;
+
+			im_gris[i][j + 3] = im_gris[i][j + 3] >> 2;
+			im_gris[i][j + 3] = im_gris[i][j + 3] << 2;
+			im_gris[i][j + 3] = im_gris[i][j + 3] | tmp4;
+		}
+	}
+	return;
+}
+
+void extractionTexteDepuisPGM(unsigned char im_gris[MAXROWS][MAXCOLS], long rows, long cols, int k, int nbcarac, string &textearecup)
+{
+	unsigned char tmp1, tmp2, tmp3, tmp4;
+	int compteur = 0;
+	textearecup.resize(nbcarac);
+	for (int i = k + 2 * sqrt(nbcarac); i < k + 4 * sqrt(nbcarac) && compteur < nbcarac; i++)
+	{
+		for (int j = k + 2 * sqrt(nbcarac); j < k + 4 * sqrt(nbcarac) && compteur < nbcarac; j += 4)
+		{
+			// A cause de l'optimisation de compilateur (je suppose?) il faut séparer les lignes pour que ce soit bien des 0 qui remplacent les anciens bits
+			tmp1 = im_gris[i][j] << 6;
+			tmp1 = tmp1 >> 6;
+			tmp2 = im_gris[i][j + 1] << 6;
+			tmp2 = tmp2 >> 4;
+			tmp3 = im_gris[i][j + 2] << 6;
+			tmp3 = tmp3 >> 2;
+			tmp4 = im_gris[i][j + 3] << 6;
+
+			textearecup[compteur] = tmp1 | tmp2 | tmp3 | tmp4;
+			compteur++;
+		}
+	}
+	return;
+
+}
+
 int main()
 {
 	long rows, cols;
 	int debutcarre1, debutcarre2, taillecarres;
 	char nomfich[20];
+	string texteacacher;
+	string textearecup;
 	unsigned char photo[MAXROWS][MAXCOLS];
-	unsigned char photo2[MAXROWS][MAXCOLS];
-	PPMImage *image;
+	//unsigned char photo2[MAXROWS][MAXCOLS];
+	//PPMImage *image;
 	cout << "Nom du fichier pgm :";
 	cin >> nomfich;
 	readPGM(nomfich, rows, cols, photo);
+	/*
 	cout << "Nom du fichier ppm :";
 	cin >> nomfich;
 	image = readPPM(nomfich);
+	*/
 	/*
 	patchworkPGM(image, rows, cols, debutcarre1, debutcarre2, taillecarres);
 	cout << "debut carre 1 :\t" << debutcarre1 << endl;
@@ -482,10 +573,18 @@ int main()
 	cout << "taille des carres :\t" << taillecarres << endl;
 	*/
 	//dctPGM(image, rows, cols);
+	/*
 	dissimulationPGMdansPPM(image, photo, rows, cols);
 	extractionPGMdePPM(image, photo2);
-	pgmWrite("lenares.pgm", rows, cols, photo2, "format pgm");
-	writePPM("samarch.ppm", image);
+	*/
+	cout << "Chaine de caractere a cacher sans espace qui finit par * :";
+	cin >> texteacacher;
+	cout << "Nombre de caracteres :" << texteacacher.size() << endl;
+	dissimulationTexteDansPGM(photo, rows, cols, 0, texteacacher);
+	extractionTexteDepuisPGM(photo, rows, cols, 0, texteacacher.size(), textearecup);
+	cout << "Voici la chaine recupere :" << textearecup << endl;
+	//pgmWrite("lenares.pgm", rows, cols, photo2, "format pgm");
+	//writePPM("samarch.ppm", image);
 	system("pause");
 
 
