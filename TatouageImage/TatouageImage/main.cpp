@@ -141,124 +141,67 @@ void writePPM(const char *filename, PPMImage *img)
 }
 
 using namespace std;
-/* INPUT: a filename (char*),row and column dimension variables (long), and
-*   a pointer to a 2D array of unsigned char's of size MAXROWS x MAXCOLS
-*   (row major).
-* OUTPUT: an integer is returned indicating whether or not the
-*   file was read into memory (in row major order).  1 is returned if the
-*   file is read correctly, 0 if it is not.  If there are
-*   too few pixels, the function still returns 1, but returns an error
-*   message.  Error messages are also returned if a file cannot be open,
-*   or if the specifications of the file are invalid.
-* NOTE: The case where too many pixels are in a file is not detected.
-*/
-int pgmRead(char *fileName, long *rows, long *cols,
-	unsigned char image[MAXROWS][MAXCOLS]) {
-	ifstream filePointer;    /* for file buffer */
-	char *line; /* for character input from file */
-	int maximumValue = 0; /* max value from header */
-	int binary;           /* flag to indicate if file is binary (P5)*/
-	long numberRead = 0;  /* counter for number of pixels read */
-	long i, j;             /* (i,j) for loops */
-	int temp;        /* for detecting EOF(test) and temp storage */
-	string tmpline;
+int readPGM(string Nfile, long &rows, long &cols, unsigned char image[MAXROWS][MAXCOLS])
+{
+	ifstream f(Nfile.c_str(), std::ios_base::binary);
+	char c;
 
-						   /* Open the file, return an error if necessary. */
-	filePointer.open(fileName);
-	if (filePointer.fail())
+
+	string ligne;
+	if (f.eof())
 	{
-		cout << "ERROR: file open failed, incorrect file name" << endl;
+		cout << "fichier vide";
 		return 0;
 	}
+	f >> c;
 
-	/* Initialize columnsidth, and height */
-	*cols = *rows = 0;
-
-	/* Check the file signature ("Magic Numbers" P2 and P5); skip comments
-	* and blank lines (CR with no spaces before it).*/
-	getline(filePointer, tmpline);
-	line = const_cast<char*>(tmpline.c_str());
-	while (line[0] == '#' || line[0] == '\n')
+	while (c == '#')
 	{
-		getline(filePointer, tmpline);
-		line = const_cast<char*>(tmpline.c_str());
-	}
-	// Format P2
-	if (line[0] == 'P' && (line[1] == '2')) {
-		binary = 0;
-	}
-	// Format P5
-	else if (line[0] == 'P' && (line[1] == '5')) {
-		binary = 1;
-	}
-	else {
-		printf("ERROR: incorrect file format\n\n");
-		filePointer.close();
-		return (0);
+		// Commentaire
+		getline(f, ligne);
+		f >> c;
 	}
 
-	/* Input the width, height and maximum value, skip comments and blank
-	* lines. */
-	getline(filePointer, tmpline);
-	line = const_cast<char*>(tmpline.c_str());
-	while (line[0] == '#' || line[0] == '\n')
+	if (c != 'P')
 	{
-		getline(filePointer, tmpline);
-		line = const_cast<char*>(tmpline.c_str());
+		cout << "Format incorrect !" << endl;
+		return 0;
 	}
-	sscanf_s(line, "%ld %ld", cols, rows);
-
-	getline(filePointer, tmpline);
-	line = const_cast<char*>(tmpline.c_str());
-	while (line[0] == '#' || line[0] == '\n')
+	else
 	{
-		getline(filePointer, tmpline);
-		line = const_cast<char*>(tmpline.c_str());
-	}
-	sscanf_s(line, "%d", &maximumValue);
-
-	/* display specifications and return an error if h,w, or
-	*  maximum value is illegal.*/
-	/*    printf("Rows: %ld   Columns: %ld\n",*rows,*cols); */
-	/*       printf("Maximum value: %d\n\n",maximumValue); */
-
-	if ((*cols)<1 || (*rows)<1 || maximumValue<0 || maximumValue>MAXVALUE) {
-		printf("ERROR: invalid file specifications (cols/rows/max value)\n\n");
-		filePointer.close();
-		return (0);
-	}
-	else if ((*cols) > MAXCOLS || (*rows) > MAXROWS) {
-		printf("ERROR: increase MAXROWS/MAXCOLS in PGM.h");
-		filePointer.close();
-		return (0);
-	}
-
-	/* Read in the data for binary (P5) or ascii (P2) PGM formats   */
-	if (binary) {
-		for (i = 0; i < (*rows); i++) {
-			for (j = 0; j < (*cols); j++) {
-				filePointer >> image[i][j];
-				if (filePointer.eof()) break;
-			}
-			if (filePointer.eof()) break;
-		}
-	}
-	else {
-		for (i = 0; i < (*rows); i++) {
-			for (j = 0; j < (*cols); j++) {
-				filePointer >> image[i][j];
-				if (filePointer.eof()) break;
-			}
-			if (filePointer.eof()) break;
+		f >> c;
+		if (c != '2' && c != '5')
+		{
+			cout << "Format incorrect!!" << endl;
+			return 0;
 		}
 	}
 
-	/*    printf ("  Rows * Columns = %ld\n",(*rows)*(*cols)); */
-	/*       printf ("  Number of pixels read = %ld\n\n",numberRead); */
+	f >> rows >> cols;
+	int nbniveauxgris;
+	f >> nbniveauxgris;
+	f >> ws;
 
-	/* close the file and return 1 indicating success */
-	filePointer.close();
-	return (1);
+	long indice = f.tellg();
+	int compt = 0;
+	f.seekg(indice);
+	f >> image[0][0] >> ws;
+
+	indice++;
+
+	for (long i = 0;i<rows;i++)
+	{
+		for (long j = 0;j<cols;j++)
+		{
+			f.seekg(indice);
+			f >> image[i][j] >> ws;
+			indice++;
+		}
+
+	}
+
+	return 1;
+
 }
 
 /* INPUT: a filename (char*), the dimensions of the pixmap (rows,cols of
@@ -373,6 +316,7 @@ double alphaDCT(int x, int N)
 }
 
 // Calcule la DCT d'un bloc de 8 * 8 et renvoie le tableau qui contient les résultats (PGM)
+// Ne marche pas
 unsigned char dctBlocPGM(unsigned char image[MAXROWS][MAXCOLS], int starti, int startj)
 {
 	double tmp;
@@ -391,6 +335,7 @@ unsigned char dctBlocPGM(unsigned char image[MAXROWS][MAXCOLS], int starti, int 
 }
 
 // Calcule la DCT entière et remplace l'image par celle-ci (PGM)
+// Ne marche pas
 void dctPGM(unsigned char image[MAXROWS][MAXCOLS], long rows, long cols)
 {
 	for (int i = 0; i < rows; i)
@@ -404,6 +349,7 @@ void dctPGM(unsigned char image[MAXROWS][MAXCOLS], long rows, long cols)
 }
 
 // Calcule la DCT d'un bloc de 8 * 8 et renvoie le tableau qui contient les résultats (PPM)
+// Ne marche pas
 PPMPixel dctBlocPPM(PPMImage *image, int starti, int startj)
 {
 	double tmpr;
@@ -441,6 +387,7 @@ PPMPixel dctBlocPPM(PPMImage *image, int starti, int startj)
 }
 
 // Calcule la DCT entière et remplace l'image par celle-ci (PPM)
+// Ne marche pas
 void dctPPM(PPMImage *image)
 {
 	PPMPixel tmp;
@@ -457,26 +404,78 @@ void dctPPM(PPMImage *image)
 	return;
 }
 
+// Met les bits d'une image gris dans un pixel d'image de couleur en découpant un octet en 3 parties, 3, 3 et 2 qui sont mises dans les bits de poids faibles du pixel
+void dissimulationPGMdansPPM(PPMImage *im_rvb, unsigned char im_gris[MAXROWS][MAXCOLS], long rows, long cols)
+{
+	if ((rows != im_rvb->x) || (cols != im_rvb->y))
+	{
+		cout << "Erreur, les deux images ne sont pas de la meme taille. La fonction a ete annulee." << endl;
+		return;
+	}
+	unsigned char tmp1, tmp2, tmp3;
+	
+	for (int i = 0; i < im_rvb->x; i++)
+	{
+		for (int j = 0; j < im_rvb->y; j++)
+		{
+			tmp1 = (im_gris[i][j] << 5) >> 5;
+			tmp2 = (im_gris[i][j] << 2) >> 5;
+			tmp3 = im_gris[i][j] >> 6;
+
+			im_rvb->data[i * im_rvb->x + j].red = ((im_rvb->data[i * im_rvb->x + j].red >> 3) << 3) | tmp1;
+			im_rvb->data[i * im_rvb->x + j].green = ((im_rvb->data[i * im_rvb->x + j].green >> 3) << 3) | tmp2;
+			im_rvb->data[i * im_rvb->x + j].blue = ((im_rvb->data[i * im_rvb->x + j].blue >> 2) << 2) | tmp3;
+		}
+	}
+	return;
+}
+
+// Sort les bits d'une image gris à partir d'une image de couleur en récupérant les bits de poids faibles dans les composantes de couleurs
+void extractionPGMdePPM(PPMImage *im_rvb, unsigned char im_gris[MAXROWS][MAXCOLS])
+{
+	unsigned char tmp1, tmp2, tmp3;
+
+	for (int i = 0; i < im_rvb->x; i++)
+	{
+		for (int j = 0; j < im_rvb->y; j++)
+		{
+			tmp1 = im_rvb->data[i * im_rvb->x + j].red << 5;
+			tmp1 = tmp1 >> 5;
+			tmp2 = im_rvb->data[i * im_rvb->x + j].green << 5;
+			tmp2 = tmp2 >> 2;
+			tmp3 = im_rvb->data[i * im_rvb->x + j].blue << 6;
+
+			im_gris[i][j] = tmp1 | tmp2 | tmp3;
+		}
+	}
+	return;
+}
+
 int main()
 {
 	long rows, cols;
 	int debutcarre1, debutcarre2, taillecarres;
 	char nomfich[20];
-	unsigned char image[MAXROWS][MAXCOLS];
-	//PPMImage *image;
-	cout << "Nom du fichier :";
+	unsigned char photo[MAXROWS][MAXCOLS];
+	unsigned char photo2[MAXROWS][MAXCOLS];
+	PPMImage *image;
+	cout << "Nom du fichier pgm :";
 	cin >> nomfich;
-	pgmRead(nomfich, &rows, &cols, image);
-	//image = readPPM(nomfich);
+	readPGM(nomfich, rows, cols, photo);
+	cout << "Nom du fichier ppm :";
+	cin >> nomfich;
+	image = readPPM(nomfich);
 	/*
 	patchworkPGM(image, rows, cols, debutcarre1, debutcarre2, taillecarres);
 	cout << "debut carre 1 :\t" << debutcarre1 << endl;
 	cout << "debut carre 2 :\t" << debutcarre2 << endl;
 	cout << "taille des carres :\t" << taillecarres << endl;
 	*/
-	dctPGM(image, rows, cols);
-	pgmWrite("lenares.pgm", rows, cols, image, "format pgm");
-	//writePPM("samarch.ppm", image);
+	//dctPGM(image, rows, cols);
+	dissimulationPGMdansPPM(image, photo, rows, cols);
+	extractionPGMdePPM(image, photo2);
+	pgmWrite("lenares.pgm", rows, cols, photo2, "format pgm");
+	writePPM("samarch.ppm", image);
 	system("pause");
 
 
