@@ -3,12 +3,14 @@ c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\
 c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(218): warning C4101: 'maxval' : variable locale non référencée
 c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(263): warning C4244: 'argument' : conversion de 'time_t' en 'unsigned int', perte possible de données
 c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(286): warning C4244: 'argument' : conversion de 'time_t' en 'unsigned int', perte possible de données
-c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(490): warning C4244: 'initialisation' : conversion de 'double' en 'int', perte possible de données
-c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(492): warning C4244: 'initialisation' : conversion de 'double' en 'int', perte possible de données
-c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(530): warning C4244: 'initialisation' : conversion de 'double' en 'int', perte possible de données
+c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(491): warning C4244: 'initialisation' : conversion de 'double' en 'int', perte possible de données
+c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(493): warning C4244: 'initialisation' : conversion de 'double' en 'int', perte possible de données
 c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(532): warning C4244: 'initialisation' : conversion de 'double' en 'int', perte possible de données
-c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(584): warning C4267: 'argument' : conversion de 'size_t' en 'int', perte possible de données
-c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(554): warning C4101: 'taillecarres' : variable locale non référencée
-c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(554): warning C4101: 'debutcarre2' : variable locale non référencée
-c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(554): warning C4101: 'debutcarre1' : variable locale non référencée
+c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(534): warning C4244: 'initialisation' : conversion de 'double' en 'int', perte possible de données
+c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(655): warning C4101: 'a' : variable locale non référencée
+c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(655): warning C4101: 'y' : variable locale non référencée
+c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(655): warning C4101: 'x' : variable locale non référencée
+c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(655): warning C4101: 'taillecarres' : variable locale non référencée
+c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(655): warning C4101: 'debutcarre2' : variable locale non référencée
+c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(655): warning C4101: 'debutcarre1' : variable locale non référencée
   TatouageImage.vcxproj -> C:\Users\Laurent\Documents\GitKraken\Tatouage-Image\TatouageImage\x64\Debug\TatouageImage.exe

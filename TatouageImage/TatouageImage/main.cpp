@@ -257,7 +257,7 @@ int pgmWrite(char* filename, long rows, long cols,
 	return(1);
 }
 
-// Utilise la méthode du patchwork (PPM)
+// Utilise la méthode du patchwork (PPM) (TP1)
 void patchworkPPM(PPMImage *image, int &debutcarre1, int &debutcarre2, int &taillecarres)
 {
 	srand(time(NULL));
@@ -280,7 +280,7 @@ void patchworkPPM(PPMImage *image, int &debutcarre1, int &debutcarre2, int &tail
 	}
 }
 
-// Utilise la méthode du patchwork (PGM)
+// Utilise la méthode du patchwork (PGM) (TP1)
 void patchworkPGM(unsigned char image[MAXROWS][MAXCOLS], long rows, long cols, int &debutcarre1, int &debutcarre2, int &taillecarres)
 {
 	srand(time(NULL));
@@ -302,7 +302,7 @@ void patchworkPGM(unsigned char image[MAXROWS][MAXCOLS], long rows, long cols, i
 		}
 	}
 }
-
+// alpha de la fonction de la DCT (TP1)
 double alphaDCT(int x, int N)
 {
 	if (x == 0)
@@ -315,7 +315,7 @@ double alphaDCT(int x, int N)
 	}
 }
 
-// Calcule la DCT d'un bloc de 8 * 8 et renvoie le tableau qui contient les résultats (PGM)
+// Calcule la DCT d'un bloc de 8 * 8 et renvoie le tableau qui contient les résultats (PGM) (TP1)
 // Ne marche pas
 unsigned char dctBlocPGM(unsigned char image[MAXROWS][MAXCOLS], int starti, int startj)
 {
@@ -334,7 +334,7 @@ unsigned char dctBlocPGM(unsigned char image[MAXROWS][MAXCOLS], int starti, int 
 	return (unsigned char) ret;
 }
 
-// Calcule la DCT entière et remplace l'image par celle-ci (PGM)
+// Calcule la DCT entière et remplace l'image par celle-ci (PGM) (TP1)
 // Ne marche pas
 void dctPGM(unsigned char image[MAXROWS][MAXCOLS], long rows, long cols)
 {
@@ -348,7 +348,7 @@ void dctPGM(unsigned char image[MAXROWS][MAXCOLS], long rows, long cols)
 	return;
 }
 
-// Calcule la DCT d'un bloc de 8 * 8 et renvoie le tableau qui contient les résultats (PPM)
+// Calcule la DCT d'un bloc de 8 * 8 et renvoie le tableau qui contient les résultats (PPM) (TP1)
 // Ne marche pas
 PPMPixel dctBlocPPM(PPMImage *image, int starti, int startj)
 {
@@ -386,7 +386,7 @@ PPMPixel dctBlocPPM(PPMImage *image, int starti, int startj)
 	return ret;
 }
 
-// Calcule la DCT entière et remplace l'image par celle-ci (PPM)
+// Calcule la DCT entière et remplace l'image par celle-ci (PPM) (TP1)
 // Ne marche pas
 void dctPPM(PPMImage *image)
 {
@@ -404,7 +404,7 @@ void dctPPM(PPMImage *image)
 	return;
 }
 
-// Met les bits d'une image gris dans un pixel d'image de couleur en découpant un octet en 3 parties, 3, 3 et 2 qui sont mises dans les bits de poids faibles du pixel
+// Met les bits d'une image gris dans un pixel d'image de couleur en découpant un octet en 3 parties, 3, 3 et 2 qui sont mises dans les bits de poids faibles du pixel (Exercice 1)
 void dissimulationPGMdansPPM(PPMImage *im_rvb, unsigned char im_gris[MAXROWS][MAXCOLS], long rows, long cols)
 {
 	if ((rows != im_rvb->x) || (cols != im_rvb->y))
@@ -440,7 +440,7 @@ void dissimulationPGMdansPPM(PPMImage *im_rvb, unsigned char im_gris[MAXROWS][MA
 	return;
 }
 
-// Sort les bits d'une image gris à partir d'une image de couleur en récupérant les bits de poids faibles dans les composantes de couleurs
+// Sort les bits d'une image gris à partir d'une image de couleur en récupérant les bits de poids faibles dans les composantes de couleurs (Exercice 1)
 void extractionPGMdePPM(PPMImage *im_rvb, unsigned char im_gris[MAXROWS][MAXCOLS])
 {
 	unsigned char tmp1, tmp2, tmp3;
@@ -461,6 +461,7 @@ void extractionPGMdePPM(PPMImage *im_rvb, unsigned char im_gris[MAXROWS][MAXCOLS
 	return;
 }
 
+// Dissimule un texte dans une image en niveau de gris en découpant les bits (Exercice 2)
 void dissimulationTexteDansPGM(unsigned char im_gris[MAXROWS][MAXCOLS], long rows, long cols, int k, string texteacacher)
 {
 	if (texteacacher.size() > (cols * rows) / 4)
@@ -522,6 +523,7 @@ void dissimulationTexteDansPGM(unsigned char im_gris[MAXROWS][MAXCOLS], long row
 	return;
 }
 
+// Extrait un texte d'une image de niveau de gris (Exercice 2)
 void extractionTexteDepuisPGM(unsigned char im_gris[MAXROWS][MAXCOLS], long rows, long cols, int k, int nbcarac, string &textearecup)
 {
 	unsigned char tmp1, tmp2, tmp3, tmp4;
@@ -545,27 +547,126 @@ void extractionTexteDepuisPGM(unsigned char im_gris[MAXROWS][MAXCOLS], long rows
 		}
 	}
 	return;
+}
 
+// Fonction qui renvoie 1 si le bit du caractère est égal à 1 et -1 s'il est égal à 0 (Exercice 3)
+int wByte(int x, string texte)
+{
+	int entier = x / 8;
+	int reste = x % 8;
+	unsigned char tmp = texte[entier];
+	tmp = tmp >> (7 - reste);
+	tmp = tmp << 7;
+	if (tmp == (unsigned char)128)
+	{
+		return 1;
+	}
+	else
+	{
+		return -1;
+	}
+}
+
+// Dissimule une chaine de 8 caractères dans une image de niveau de gris (Exercice 3)
+void dissimulationChaineCaracDansPGM(unsigned char im_gris[MAXROWS][MAXCOLS], long rows, long cols, int a, int x, int y, string texteacacher)
+{
+	if (x + 8 >= cols || y + 8 >= rows)
+	{
+		cout << "Debut du carre trop loin par rapport à la taille de l'image" << endl;
+		return;
+	}
+	else if (x < 0 || y < 0)
+	{
+		cout << "En dehors de l'image" << endl;
+		return;
+	}
+	if (a == 0)
+	{
+		cout << "Constante ne doit pas etre nulle" << endl;
+		return;
+	}
+
+	int tmp;
+	for (int i = x; i < x + 8; i++)
+	{
+		for (int j = y; j < y + 8; j++)
+		{
+			tmp = (im_gris[i][j] + a * wByte((i - x) * 8 + (j - y), texteacacher));
+			if (tmp > 255)
+			{
+				im_gris[i][j] = 255;
+			}
+			else if (tmp < 0)
+			{
+				im_gris[i][j] = 0;
+			}
+			else
+			{
+				im_gris[i][j] = tmp;
+			}
+		}
+	}
+	return;
+}
+
+// Extrait une chaine de 8 caractères cachée dans une image à partir de l'image originale et de la nouvelle image (Exercice 3)
+void extractionChaineCaracDansPGM(unsigned char im_gris_orig[MAXROWS][MAXCOLS], unsigned char im_gris_modif[MAXROWS][MAXCOLS], long rows, long cols, int a, int x, int y, string &textearecup)
+{
+	if (x + 8 >= cols || y + 8 >= rows)
+	{
+		cout << "Debut du carre trop loin par rapport à la taille de l'image" << endl;
+		return;
+	}
+	else if (x < 0 || y < 0)
+	{
+		cout << "En dehors de l'image" << endl;
+		return;
+	}
+
+	int tmp;
+	unsigned char tmpbit, tmptot;
+	textearecup.resize(8);
+
+	for (int i = x; i < x + 8; i++)
+	{
+		tmptot = (unsigned char)0;
+		for (int j = y; j < y + 8; j++)
+		{
+			tmp = (int) ((im_gris_modif[i][j] - im_gris_orig[i][j]) / a);
+			if (tmp < 0)
+			{
+				tmpbit = (unsigned char)0;
+			}
+			else
+			{
+				tmpbit = (unsigned char)1;
+			}
+			tmpbit = tmpbit << (7 - (j - y));
+			tmptot = tmptot | tmpbit;
+		}
+		textearecup[i - x] = tmptot;
+	}
+	return;
 }
 
 int main()
 {
 	long rows, cols;
-	int debutcarre1, debutcarre2, taillecarres;
+	int debutcarre1, debutcarre2, taillecarres, a, x, y;
 	char nomfich[20];
 	string texteacacher;
 	string textearecup;
 	unsigned char photo[MAXROWS][MAXCOLS];
-	//unsigned char photo2[MAXROWS][MAXCOLS];
-	//PPMImage *image;
+	unsigned char photo2[MAXROWS][MAXCOLS];
+	PPMImage *image;
 	cout << "Nom du fichier pgm :";
 	cin >> nomfich;
 	readPGM(nomfich, rows, cols, photo);
-	/*
+
 	cout << "Nom du fichier ppm :";
 	cin >> nomfich;
 	image = readPPM(nomfich);
-	*/
+	
 	/*
 	patchworkPGM(image, rows, cols, debutcarre1, debutcarre2, taillecarres);
 	cout << "debut carre 1 :\t" << debutcarre1 << endl;
@@ -573,20 +674,32 @@ int main()
 	cout << "taille des carres :\t" << taillecarres << endl;
 	*/
 	//dctPGM(image, rows, cols);
-	/*
+	
 	dissimulationPGMdansPPM(image, photo, rows, cols);
 	extractionPGMdePPM(image, photo2);
-	*/
-	cout << "Chaine de caractere a cacher sans espace qui finit par * :";
+	
+	/*
+	cout << "Chaine de caracteres a cacher sans espace qui finit par * :";
 	cin >> texteacacher;
-	cout << "Nombre de caracteres :" << texteacacher.size() << endl;
 	dissimulationTexteDansPGM(photo, rows, cols, 0, texteacacher);
 	extractionTexteDepuisPGM(photo, rows, cols, 0, texteacacher.size(), textearecup);
+	cout << "Voici la chaine recuperee :" << textearecup << endl;
+	*/
+	/*
+	cout << "Chaine de 8 caracteres a cacher :";
+	cin >> texteacacher;
+	cout << "Quel endroit? (x puis y) :" << endl;
+	cin >> x;
+	cin >> y;
+	cout << "Constante a (pas trop grande ( < 10 serait le plus approprié ) :";
+	cin >> a;
+	memcpy(photo2, photo, sizeof(photo));
+	dissimulationChaineCaracDansPGM(photo, rows, cols, a, x, y, texteacacher);
+	extractionChaineCaracDansPGM(photo2, photo, rows, cols, a, x, y, textearecup);
 	cout << "Voici la chaine recupere :" << textearecup << endl;
-	//pgmWrite("lenares.pgm", rows, cols, photo2, "format pgm");
-	//writePPM("samarch.ppm", image);
+	*/
+	pgmWrite("testpgm.pgm", rows, cols, photo, "format pgm");
+	writePPM("testppm.ppm", image);
 	system("pause");
-
-
 
 }
