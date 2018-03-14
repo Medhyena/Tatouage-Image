@@ -1,9 +1,9 @@
 ﻿  main.cpp
-c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(187): warning C4244: 'initialisation' : conversion de 'std::streamoff' en 'long', perte possible de données
-c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(227): warning C4101: 'maxval' : variable locale non référencée
-c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(272): warning C4244: 'argument' : conversion de 'time_t' en 'unsigned int', perte possible de données
-c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(295): warning C4244: 'argument' : conversion de 'time_t' en 'unsigned int', perte possible de données
-c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(466): warning C4101: 'taillecarres' : variable locale non référencée
-c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(466): warning C4101: 'debutcarre2' : variable locale non référencée
-c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(466): warning C4101: 'debutcarre1' : variable locale non référencée
+c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(185): warning C4244: 'initialisation' : conversion de 'std::streamoff' en 'long', perte possible de données
+c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(218): warning C4101: 'maxval' : variable locale non référencée
+c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(263): warning C4244: 'argument' : conversion de 'time_t' en 'unsigned int', perte possible de données
+c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(286): warning C4244: 'argument' : conversion de 'time_t' en 'unsigned int', perte possible de données
+c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(465): warning C4101: 'taillecarres' : variable locale non référencée
+c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(465): warning C4101: 'debutcarre2' : variable locale non référencée
+c:\users\laurent\documents\gitkraken\tatouage-image\tatouageimage\tatouageimage\main.cpp(465): warning C4101: 'debutcarre1' : variable locale non référencée
   TatouageImage.vcxproj -> C:\Users\Laurent\Documents\GitKraken\Tatouage-Image\TatouageImage\x64\Debug\TatouageImage.exe

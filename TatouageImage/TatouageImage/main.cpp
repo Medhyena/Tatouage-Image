@@ -418,13 +418,23 @@ void dissimulationPGMdansPPM(PPMImage *im_rvb, unsigned char im_gris[MAXROWS][MA
 	{
 		for (int j = 0; j < im_rvb->y; j++)
 		{
-			tmp1 = (im_gris[i][j] << 5) >> 5;
-			tmp2 = (im_gris[i][j] << 2) >> 5;
+			// A cause de l'optimisation de compilateur (je suppose?) il faut séparer les lignes pour que ce soit bien des 0 qui remplacent les anciens bits
+			tmp1 = im_gris[i][j] << 5;
+			tmp1 = tmp1 >> 5;
+			tmp2 = im_gris[i][j] << 2;
+			tmp2 = tmp2 >> 5;
 			tmp3 = im_gris[i][j] >> 6;
 
-			im_rvb->data[i * im_rvb->x + j].red = ((im_rvb->data[i * im_rvb->x + j].red >> 3) << 3) | tmp1;
-			im_rvb->data[i * im_rvb->x + j].green = ((im_rvb->data[i * im_rvb->x + j].green >> 3) << 3) | tmp2;
-			im_rvb->data[i * im_rvb->x + j].blue = ((im_rvb->data[i * im_rvb->x + j].blue >> 2) << 2) | tmp3;
+			// Pareil que juste avant
+			im_rvb->data[i * im_rvb->x + j].red = im_rvb->data[i * im_rvb->x + j].red >> 3;
+			im_rvb->data[i * im_rvb->x + j].red = im_rvb->data[i * im_rvb->x + j].red << 3;
+			im_rvb->data[i * im_rvb->x + j].red = im_rvb->data[i * im_rvb->x + j].red | tmp1;
+			im_rvb->data[i * im_rvb->x + j].green = im_rvb->data[i * im_rvb->x + j].green >> 3;
+			im_rvb->data[i * im_rvb->x + j].green = im_rvb->data[i * im_rvb->x + j].green << 3;
+			im_rvb->data[i * im_rvb->x + j].green = im_rvb->data[i * im_rvb->x + j].green | tmp2;
+			im_rvb->data[i * im_rvb->x + j].blue = im_rvb->data[i * im_rvb->x + j].blue >> 2;
+			im_rvb->data[i * im_rvb->x + j].blue = im_rvb->data[i * im_rvb->x + j].blue << 2;
+			im_rvb->data[i * im_rvb->x + j].blue = im_rvb->data[i * im_rvb->x + j].blue | tmp3;
 		}
 	}
 	return;
